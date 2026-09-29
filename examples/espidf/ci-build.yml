@@ -1,0 +1,26 @@
+name: espidf-build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install ESP-IDF deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y git wget python3 python3-pip cmake ninja-build ccache
+
+      - name: Build project
+        run: |
+          mkdir -p ~/esp
+          git clone --depth 1 --branch v5.4.4 https://github.com/espressif/esp-idf.git ~/esp/esp-idf
+          . ~/esp/esp-idf/export.sh
+          cd $GITHUB_WORKSPACE
+          idf.py set-target esp32p4
+          idf.py build
